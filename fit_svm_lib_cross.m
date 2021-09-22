@@ -1,7 +1,7 @@
 function [erro, sv, corr] = fit_svm_lib_cross(X1, y1, conj, tipo_sv, varargin)
 
-
-% Função que realiza o cross-validation
+%X1, y1, conj, epsilon,tipo_sv, kernel, x_obl(i,:)
+% Função que realiza o crossover
 kernel = varargin{1};
 x = varargin{2};
 [~, yc]=size(y1);
@@ -21,7 +21,8 @@ for i1=1:m
     [erro1, sv1, corr1] = fit_svm_lib(x1, y_c, x2cv, y2cv, tipo_sv, kernel, x(1,:));
     erro = erro + erro1;
     sv = sv + sv1;
-    corr = corr + corr1;    
+    corr = corr + corr1;
+    %[erro, sv, corr] = fit_svm_lib_cross(X1, y1, conj, tipo_sv, kernel, x(i,:)); %x(1) -> C e x(2) -> sigma
 end
 erro = erro/m;
 sv = sv/m;

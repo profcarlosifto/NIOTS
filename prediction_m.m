@@ -12,10 +12,10 @@ aux = x;
 x = aux.x;
 min_x = model(1).normaliza(:,1)';
 max_x = model(1).normaliza(:,2)';
-x = normalize_prediction(x, min_x, max_x); 
+x = normalize_prediction(x, min_x, max_x); %Definir o mínimo e o máximo da série de treinamento, estes dados são do conjunto de treinamento
 %% Primeira fase do processo
 [m n]=size(x);
-[mg ng] = size(model(1).gama'); 
+[mg ng] = size(model(1).gama'); %transforma o vetor gama em um vetor coluna, questão de facilidade
 y1 = zeros (m , mg);
 yf = zeros (m , mg);
 for i = 1:m

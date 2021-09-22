@@ -9,5 +9,5 @@ function y = kernel_polynomial(x, xi, d)
 % xi => vetor linha de entrada n-dimensional
 % y  =>  escalar saída da função
 
-y = (x*xi' + 0)^d;
+y = (x*xi' + 1)^d;
 end

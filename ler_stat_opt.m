@@ -9,6 +9,9 @@ tline1 = str2num(tline);
 [i,j] = size(tline1);
 spacing = zeros(i,j);
 
+%spacing_t = zeros(1,j);
+%card_t = zeros(1,j);
+
 card = zeros(i,j);
 t = 1;
 s = 1;
@@ -36,4 +39,7 @@ t = t+1;
 end
 metricas.itera = [spacing' card' hyper'];
 metricas.otima = [spacing_t' card_t' hyper_t'];
+%Falta mudar a saída para passar as variáveis card_t e spacing_t para fora
+%da função e ajustar onde a função já foi usada
+%metricas = str2num(metricas);
 end

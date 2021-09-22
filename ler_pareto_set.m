@@ -8,6 +8,8 @@ function pareto = ler_pareto_set (file_path, index, sample)
 % index     -> indice da fronteira de pareto, para auxliar no processo de
 %              concatenar dados
 
+%file_path = '/home/carlos/Documentos/doutorado/sistema/projeto_svm/rascunhos/hermite_ens/report_hermite.txt';
+
 file = fopen (file_path, 'r');
 index = 0;
 if (file == -1)
@@ -26,11 +28,11 @@ else
          
          elseif strcmp(tline_dados{1}, 'Sample') && (str2double(tline_dados{2})== sample) 
              tline = fgetl(file);
-             tline = fgetl(file);               
+             tline = fgetl(file);               % Incrementa para colocar o ponteiro no início da tabela
              tline_dados = strsplit(tline);
              
              if strcmp(kernel, 'RBF') && strcmp(tipo_svm, 'Regression')
-                 while (length(tline_dados)>1)&& ischar(tline)                  
+                 while (length(tline_dados)>1)&& ischar(tline) % while com problema de finalização e inicialização                    
                      pareto(i).index = index + str2double(tline_dados{2});
                      pareto(i).kernel = 'RBF';
                      pareto(i).c = str2double(tline_dados{3});
@@ -49,7 +51,7 @@ else
                  end
                                   
              elseif strcmp(kernel, 'Polynomial') && strcmp(tipo_svm, 'Regression')
-                 while (length(tline_dados)>1)&& ischar(tline)                   
+                 while (length(tline_dados)>1)&& ischar(tline) % while com problema de finalização e inicialização                    
                      pareto(i).index = index + str2double(tline_dados{2});
                      pareto(i).kernel = 'Poly';
                      pareto(i).c = str2double(tline_dados{3});
@@ -68,7 +70,7 @@ else
                      tline_dados = strsplit(tline);
                  end                 
              elseif strcmp(kernel, 'RBF') && strcmp(tipo_svm, 'Classification')
-                 while (length(tline_dados)>1)&& ischar(tline) 
+                 while (length(tline_dados)>1)&& ischar(tline) % while com problema de finalização e inicialização
                      pareto(i).index = index + str2double(tline_dados{2});
                      pareto(i).kernel = 'RBF';
                      pareto(i).c = str2double(tline_dados{3});
@@ -85,7 +87,7 @@ else
                  end
                  
              elseif strcmp(kernel, 'Polynomial') && strcmp(tipo_svm, 'Classification')
-                 while (length(tline_dados)>1)&& ischar(tline) 
+                 while (length(tline_dados)>1)&& ischar(tline) % while com problema de finalização e inicialização
                      pareto(i).index = index + str2double(tline_dados{2});
                      pareto(i).kernel = 'Poly';
                      pareto(i).c = str2double(tline_dados{3});

@@ -1,0 +1,20 @@
+Parâmetros Gerais
+Iterações: 	50
+Cross-set: 	2
+Amostra: 	1
+
+Parâmetros do MODE
+
+ Population:		20
+ Scale factor:  0.8000
+ Crossover rate: 	 0.3000
+ Lower limit:  	 0.0000
+ Upper limit:  	250.0000
+Modificador: Nenhum
+      C    Gama    Erro         SV
+91.6667 10.55483326   0.0031 94.0000
+71.2067 58.85490653   0.0071 88.0000
+67.2326 10.55483326   0.0034 93.0000
+165.3795 46.75504389   0.0066 91.0000
+162.6176 43.89271015   0.0067 90.0000
+

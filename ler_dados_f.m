@@ -5,6 +5,7 @@ function x = ler_dados_f(nome)
 % nome  -> string com o nome do arquivo de saída
 % x     -> dados do espaço de entrada
 % y     -> rótulos dos dados de entrada. Essa função não lê os label
+%fscanf
 arquivo = fopen(nome, 'r');
 tline = fgetl(arquivo);
 tline = strsplit(tline);
@@ -18,6 +19,7 @@ while ischar(tline)
 end
 [m n]=size(A);
 x = A(:,1:dim_x);
+%y = A(:,dim_x+1:n); Única diferença entre ler_dados e ler_dados_f
 end
 
 

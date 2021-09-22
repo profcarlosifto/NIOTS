@@ -11,20 +11,23 @@ function [Mutant, set_parameter]= mutant_generate(Parent, JxParent, F, Bounds, X
 ind_best = criterio.ind_best;
 if n == 1
     set_parameter = calcula_nr_mutacao (JxParent, set_parameter, n, Ite_max,criterio);
-elseif mod(n,5) == 0
+elseif mod(n,3) == 0
     set_parameter = calcula_nr_mutacao (JxParent, set_parameter, n, Ite_max, criterio);
 end
-
+%nr_mut1 = size(set_parameter.mutacao(1).tipo,2);
 Mutant1 = mutant_de_rand_1(Parent, F, Bounds, dir_ar, set_parameter);
 
+%nr_mut2 = size(set_parameter.mutacao(2).tipo,2);
 Mutant2 = mutant_rand_2 (Parent, F, Bounds, dir_ar, set_parameter);
 
 %nr_mut3 = size(set_parameter.mutacao(3).tipo,2);
-Mutant3 = mutant_tournament_1(Parent, JxParent, F, Bounds, criterio.fi, dir_ar, set_parameter);
+ Mutant3 = mutant_tournament_1(Parent, JxParent, F, Bounds, criterio.fi, dir_ar, set_parameter);
 
 %nr_mut3 = size(set_parameter.mutacao(3).tipo,2);
-%Mutant3 = mutant_current_best_1 (Parent, F, Bounds, ind_best, dir_ar, set_parameter);
+%Mutant3 = mutant_current_best_1 (Parent, F, Bounds, nr_mut3, ind_best, dir_ar, set_parameter);
 
+%nr_mut4 = size(set_parameter.mutacao(4).tipo,2);
+%ind_best = best_parent (JxParent);
 Mutant4 = mutant_rand_best_1(Parent, F, Bounds, ind_best, dir_ar, set_parameter);
 
 Mutant = [Mutant1; Mutant2; Mutant3; Mutant4];
@@ -248,12 +251,15 @@ else
         
         j = 0;
         for i = 1:4
-                set_parameter.mutacao(i).tipo = j+1:(N(i)+j); 
-                j = j + N(i);             
+%            if ~isempty(set_parameter.mutacao(i).tipo)
+             if ~isempty(N(i))||(N(i)==0)
+                set_parameter.mutacao(i).tipo = j+1:(N(i)+j); % Descobrir pq gera NaN neste ponto.
+                j = j + N(i);
+            end
         end
     else
-        set_parameter.mutacao(randi(4,1)).tipo = (1:PS); 
-    end 
+        set_parameter.mutacao(randi(4,1)).tipo = (1:PS); %Por alguma motivo em alguns casos todas as mutações recebem zero. Verificar se alguma mutação está recebendo NaN.
+    end %Colocar restrição para NaN neste ponto, pois a if (St ~=0) testa apenas se todos são iguais a zero.
  
 end
 set_parameter.rand_1 = size(set_parameter.mutacao(1).tipo,2);

@@ -5,10 +5,11 @@ function maquina = ler_saida_st (nome)
 fid = fopen(nome);
 tline = fgets(fid);
 
-while ischar(tline)    
+while ischar(tline)
+    %disp(tline)
     aux = strsplit(tline);
     if (strcmp (aux{1},'C:'))
-        maquina.C = exp(str2num(aux{2}));
+        maquina.C = str2num(aux{2});
     
     elseif (strcmp (aux{1},'Kernel:'))
         maquina.kernel = aux{2};
@@ -16,14 +17,7 @@ while ischar(tline)
     elseif (strcmp (aux{1},'Modelo:'))
         maquina.modelo = aux{2};
         
-    elseif strcmp (aux{1},'Gama:')&& (strcmp (maquina.kernel,'RBF_kernel')||strcmp (maquina.kernel,'Cauchy'))
-        %maquina.gama = exp(str2num(aux{2}));
-        maquina.gama = str2num(aux{2});
-        
-    elseif strcmp (aux{1},'Gama:')&& (strcmp (maquina.kernel,'poly_kernel')||strcmp (maquina.kernel,'Hermite'))
-        maquina.gama = str2num(aux{2});
-
-    elseif strcmp (aux{1},'Order:')
+    elseif (strcmp (aux{1},'Gama:'))
         maquina.gama = str2num(aux{2});
         
     elseif (strcmp(aux{1}, 'Class'))
@@ -51,28 +45,28 @@ while ischar(tline)
             aux = strsplit(tline);
         end        
     elseif((sum(strncmp('Min',tline,3))))
-        tline = fgets(fid);         
+        tline = fgets(fid);         %A função fgets faz o papel de contador do while
         tline = strtrim(tline);
         aux = strsplit(tline);
         i=1;
         while (~(sum(strncmp('',aux,1))))
             maquina.normaliza(i,1) = str2num(aux{1});
             maquina.normaliza(i,2) = str2num(aux{2});
-            tline = fgets(fid);         
+            tline = fgets(fid);         %A função fgets faz o papel de contador do while
             tline = strtrim(tline);
             aux = strsplit(tline);            
-            i = i+1;                    
+            i = i+1;                    %Contador para auxiliar na distinção entre fase 1 e 2.
         end
     elseif(strcmp (aux{1},'Conjunto'))
         tline = fgets(fid);
-        tline = strtrim(tline); 
+        tline = strtrim(tline); % Esta função corta as strings que contém somente espaços em branco do começo e do final do vetor.
         aux = strsplit(tline);
         [~, xc]=size(aux);
         i=1;
         while ischar(tline)
             tline = strtrim(tline);
             aux = strsplit(tline);
-            for j = 1:xc-1                                
+            for j = 1:xc-1                  %Por que sempre a última coluna será yt                
                 maquina.xt(i,j) = str2num(aux{j}); 
             end
             maquina.yt(i,1) = str2num(aux{j+1}); 

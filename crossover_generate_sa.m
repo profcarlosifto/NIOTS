@@ -25,6 +25,9 @@ S_exp = sum(delta_fcros_exp);
 S_t = S_bin + S_exp;
 
 N_bin_c = round (PS*S_bin/S_t);
+%N_exp = round (PS*S_exp/S_t);
+%rev = randperm(PS);
+%N_exp = set_parameter.exp;
 
 rev = 1:PS;
 %Condicional que soma ou subtrai a quantidade de indivíduos que receberão o
@@ -68,7 +71,7 @@ function Child = crossover_binomial(Parent, Mutant, parameter_cross)
 %                   crossover.
 Nvar = size(Parent,2);
 set_card = size(parameter_cross.bin,2);
-
+%set_card = size(parameter_cross.bin,2) + size(parameter_cross.exp,2);
 Child = zeros(set_card, Nvar);
 for i = 1:set_card
     j = randi(Nvar,1);
@@ -97,7 +100,7 @@ Child = zeros(set_card, Nvar);
 
 for i = 1:set_card
     k = randi(Nvar,1);
-    L = randi(Nvar,1);  
+    L = randi(Nvar,1);  % Função de crossover exponencial com defeito.
     if k < L
         for j = 1:Nvar
             if (j >= k) && ( j <= L)

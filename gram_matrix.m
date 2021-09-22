@@ -15,7 +15,16 @@ K = Xt*Xt';
 kernel = x(1,3)*kernel_rbf_m(Xt, x(1,2)) + (1-x(1,3))*K;
 norma = l/trace(kernel);
 kernel = norma*kernel;
-
+% Tentativa de normalizar o kernel não foi bem sucedida, provavelmente por
+% conta da função predict.
+%{ 
+for i = 1:l
+    for j = i:l
+        kernel(i,j) = kernel(i,j)/sqrt(kernel(i,i)*kernel(j,j));
+        kernel(j,i) = kernel(i,j)/sqrt(kernel(i,i)*kernel(j,j));
+    end
+end
+%}
 kernel = [(1:l)', kernel];
 
  

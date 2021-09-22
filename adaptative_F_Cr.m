@@ -17,7 +17,8 @@ wf = 0.8+0.2*rand;
 Fm = (1-wf)*Fm + wf*ml;
 F = wf*F + (1-wf)*ml;
 % No artigo em algum momento o conjunto Fi pode ser vazio e então ocorre
-% uma outra condição para o cálculo do F.
+% uma outra condição para o cálculo do F, entretanto esta condição não foi
+% identificada ler com mais cuidado no futuro
 
 %% Cálculo do Cr
 for i = 1:NP

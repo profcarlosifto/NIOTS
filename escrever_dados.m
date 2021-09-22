@@ -12,7 +12,7 @@ arquivo = fopen(nome, 'wt');
 fprintf(arquivo, 'Dim (X): %i\n', c);
 for i = 1:m
     for j = 1:n
-        fprintf(arquivo,'%20.15f ', X(i,j));
+        fprintf(arquivo,'%f ', X(i,j));
     end
     fprintf(arquivo,'\n');
 end

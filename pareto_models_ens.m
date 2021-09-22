@@ -10,23 +10,12 @@ function [models, min_x, max_x] = pareto_models_ens (pareto, x, y)
 
 m = length (pareto);
 %models = struct([]);
-if isfield(pareto,'epsilon')
-    for i = 1:m
-        if strcmp(pareto(i).kernel,'RBF')
-            models(i).model = svmtrain(y, xn,['-s 3',' -c ', num2str(exp(pareto(i).c)),' -t 2 ','-g ', num2str(exp(pareto(i).gamma)) , ' -p ', num2str(pareto(i).epsilon), ' -h 1']);
-            
-        elseif strcmp(pareto(i).kernel,'Poly')
-            models(i).model = svmtrain(y, xn,['-s 3',' -c ', num2str(exp(pareto(i).c)),' -t 1 ','-g ', num2str(exp(pareto(i).gamma)) , ' -p ', num2str(pareto(i).epsilon), ' -h 1']);
-        end
-    end
-else
-    for i = 1:m
-        if strcmp(pareto(i).kernel,'RBF')
-            models(i).model = svmtrain(y, xn,['-s 0',' -c ', num2str(exp(pareto(i).c)),' -t 2 ','-g ', num2str(exp(pareto(i).gamma)) , ' -h 1']);
-            
-        elseif strcmp(pareto(i).kernel,'Poly')
-            models(i).model = svmtrain(y, xn,['-s 0',' -c ', num2str(exp(pareto(i).c)),' -t 1 ','-g ', num2str(exp(pareto(i).gamma)) , ' -h 1']);
-        end
+for i = 1:m
+    if strcmp(pareto(i).kernel,'RBF')
+        models(i).model = svmtrain(y, xn,['-s 3',' -c ', num2str(exp(pareto(i).c)),' -t 2 ','-g ', num2str(exp(pareto(i).gamma)) , ' -p ', num2str(pareto(i).epsilon), ' -h 1']);
+        
+    elseif strcmp(pareto(i).kernel,'Poly')
+        models(i).model = svmtrain(y, xn,['-s 3',' -c ', num2str(exp(pareto(i).c)),' -t 1 ','-g ', num2str(exp(pareto(i).gamma)) , ' -p ', num2str(pareto(i).epsilon), ' -h 1']);
     end
 end
 end

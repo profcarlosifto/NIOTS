@@ -15,7 +15,7 @@ function [metricas, param_out, pareto, poda ]= MOPSO_lib_cross(X1, y1, conj, ite
 n_obj = 2;                      % Número de funções objetivo
 S = varargin{1}{1};             % number of particles
 maxiter = ite_mopso;            % max number of iterations
-arc_size = S*5;
+arc_size = S*20;
 wf = varargin{1}{3};            % final weight
 w0 = varargin{1}{2};            % initial weight
 w=w0;                           %Inércia recebe o valor inicial 
@@ -26,7 +26,6 @@ dir_ar = 1;                     % direção inicial do modificador de diversidad
 d_low = varargin{1}{9};         %0.15; % limite inferior da diversidade
 d_high = varargin{1}{10};       %0.25; % limite superior da diversidade    
 rand_type = varargin{1}{13};    %Variável lógica que define o tipo do gerador aleatório
-indb = struct([]);                       % Inicializando a variável individuall best
 
 if isempty(conj)                %Se o conjunto cross-validation for vazio significa que existe um conjunto de predição.
     x2 = varargin{1}{14};       %Vetor característica do conjunto de teste.
@@ -41,63 +40,44 @@ end
 fx_obl=1e10*ones(S,n_obj);       % Inicializa os vetor que armazena o valor das funções objetivo de cada partícula OBL   
 
 %Condição que define a dimensão das partículas.
-d_min = 1;
-d_max = 15;
-max_v_d = 6;
-max_w_d= 0.9;
-w_d = max_w_d;
 if ischar(epsilon)  %Condição que determina se é um classificador ou não.
-    if (kernel == 1) || (kernel == 6)  || (kernel == 7)     % Kernel RBF
+    if (kernel == 1)        % Kernel RBF
         N = 2;
     elseif (kernel == 2)    % Kernel Polynomial
-        d_min = 1;
-        d_max = 15;
-        max_v_d = 6;
-        max_w_d= 0.9;
-        w_d = max_w_d;        
         N = 2;
     elseif (kernel == 3)    % Arc cosseno
         N = 1;
     elseif (kernel == 4)    % Deep kernel
-        d_min = 1;
-        d_max = 5;
-        max_v_d = 2;
-        max_w_d= 0.9;
-        w_d = max_w_d;
         N = 3;
     end
 else
-    if (kernel == 1)   || (kernel == 6)   || (kernel == 7)   % Kernel RBF
+    if (kernel == 1)        % Kernel RBF
         N = 3;
     elseif (kernel == 2)    % Kernel Polynomial
-        d_min = 1;
-        d_max = 15;
-        max_v_d = 6;
-        max_w_d= 0.9;
-        w_d = max_w_d;    
-        
         N = 3;
     elseif (kernel == 3)    % Arc cosseno
         N = 2;
     elseif (kernel == 4)    % Deep kernel
-        d_min = 1;
-        d_max = 5;
-        max_v_d = 2;
-        max_w_d= 0.9;
-        w_d = max_w_d;        
         N = 4;
     end
 end
-x_obl = zeros(S,N);            
+x_obl = zeros(S,N);             % Variável que armazena as partículas OBL. Posição 1-> C, 2-> gama, 3 -> epsilon
 
 % Range domain for fitness function
     x_max = varargin{1}{8};
     x_min = varargin{1}{7}; 
     max_v = varargin{1}{6};                  % max velocity
-    ini_v = max_v/3;                        % initial velocity
+    ini_v = max_v/10;                        % initial velocity
+%Calculando os limites do grau do polinômio.
+d_min = 1;
+d_max = 20;
+max_v_d = 3;
+max_w_d= 0.7;
+w_d = max_w_d;
 
 max_ep = epsilon;
 k = 1;                          % index of iteration
+
 
 % Just for testing particles with the same intial position. 
 % Uses the same seed for the random number generator
@@ -116,7 +96,8 @@ hyper = zeros(1,maxiter);
 dist = ones(1,maxiter);
 sols = ones(1, maxiter);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Função que inicializa as partículas de acordo com o kernel e o tipo de variável
+%% For que inicializa as partículas de acordo com o kernel e o tipo de variável
+% Possivelmente transformar essa seção do programa em uma função no futuro.
 [x, y, v, N] = initialize_particles(S, x_max, x_min, ini_v, max_ep, d_max, tipo_sv, kernel);
 
 %% Variáveis da poda
@@ -129,6 +110,11 @@ log_poda = 0;
 tic
 %mpiprofile on
 while k<= maxiter 
+%% Estudo do comportamento das partículas
+%  figure(3)
+%  plot(x(:,1),x(:,2),'.','markersize',10,'markerfacecolor','r');
+%  drawnow;
+%%
 if(mod == 2)
     if kernel == 1
         for j = 1:3
@@ -146,6 +132,8 @@ if(mod == 2)
 end
     %% Evaluates fitness and local detection
     cross = isempty(conj); 
+    %Colocar o parfor aqui para usar o modo paralelo.
+    %Para que o parfor funcione este condicional deve ser ativdado.   
     if ~ cross
         x2 = zeros(3);
         y2 = zeros(3,1);
@@ -161,6 +149,8 @@ end
                 [erro, sv, ~] = fit_svm_lib(X1, y1, x2, y2, tipo_sv, kernel, x(i,:));
             end
         end
+        %Colocar um if aqui que seleciona entre cross-validation ou não.
+        %Criar outra função fit_svm.
         fx(i,:)= [erro sv];
         if (fx(i,:) <= f_ind(i,:))        %Colocando na lista dos não dominados? 
             y(i,:) = x(i,:);
@@ -203,16 +193,49 @@ end
     nd_sols = sum(ind_nd);
     arc_x = arc_x(ind_nd,:);
     arc_f = arc_f(ind_nd,:);
-
+%% Estudo do comportamento das partículas
+% figure(1)
+% plot(arc_f(:,1),arc_f(:,2),'.','markersize',10,'markerfacecolor','r');
+% drawnow;
+%%
   
 %% Individual detection
-%[y, ys, indb] = best_detection_pso_cd (S, x, fx, arc_x, arc_f, indb, k);
-[y, ys, indb] = best_detection_pso (S, x, fx, arc_x, arc_f, indb, k );
 
-%% Modificador Atrativo-repulsivo
+for i=1:S
+    if (k == 1)
+        indb(i).x(k,:) = x(i,:);
+        indb(i).fx(k,:) = fx(i,:);
+        y(i,:) = indb(i).x(k,:);
+    else
+        indb(i).x = [indb(i).x; x(i,:)];
+        indb(i).fx = [indb(i).fx; fx(i,:)];
+        
+        [~,ia]=unique(indb(i).fx, 'rows');
+        indb(i).fx = indb(i).fx(ia,:);
+        indb(i).x = indb(i).x(ia,:);
+        
+        [indb(i).x, indb(i).fx, rank, ~] = truncate(indb(i).x, indb(i).fx, 5);
+        ind_nd_p = rank == 1;               %Serve para cortar para as soluções que possuem apenas rank == 1;
+        indb(i).x = indb(i).x(ind_nd_p,:);
+        indb(i).fx = indb(i).fx(ind_nd_p,:);
+        %ind_rp = randi(sum(ind_nd_p));             % Random index in particle non-dominate set.
+        c_fx = randi(n_obj);                            % Escolhe um dos objetivos para o mínimo.
+        %c_fx = 1;
+        [r_ind, ~, ~] = find(min(min(indb(i).fx(:,c_fx)))==indb(i).fx(:,c_fx));
+        y(i,:) = indb(i).x(r_ind(1,1),:);         % Para mudar de randômico para mínimo tem que alterar a variável desta linha
+    end
+end
+   
+%% global detection
+    ind_gbest = randi(length(arc_x));  
+    %ind_gbest = 3;    %Escolhe o erro como referência
+    ys = arc_x(min([ind_gbest nd_sols]),:);  %gbest
+    %% Modificador Atrativo-repulsivo
     if (mod == 3)
         dir_ar =  diversity (x, div_low, div_high, dir_ar, limites);
-
+        %diversity_s = diversity(x, x_max);
+        %teste_diver(k) = diversity_s; % Entender a variação da diversidade
+        
         if ((dir_ar > 0)&&(diversity_s < d_low))
             dir_ar = -1;
         elseif ((dir_ar < 0)&&(diversity_s > d_high))
@@ -223,7 +246,7 @@ end
     end
        
     %% update particles.
-    if (kernel == 1) || (kernel == 6)|| (kernel == 7) % Kernel RBF
+    if (kernel == 1) % Kernel RBF
         [x,v] = upadate_pso_particles_rbf(x, y,ys, c1, c2, w, v, x_max, x_min, S, N, max_v, dir_ar, rand_type, max_ep);
         
     elseif (kernel == 2) % Kernel polinomial
@@ -238,7 +261,7 @@ end
 
     w_d = max_w_d/k;
     w = w+slope;
-    
+    %w = ((wf-w0)/maxiter^2)*k^2+w0;
     %w = wf - k/maxiter*(wf-w0); %Linear: Ref.: A distributed PSO-SVM hybrid system with feature selection and parameter optimization. Autor: Cheng-Lung Huang, Jian-Fan Dun    k=k+1;
     
 %% Obtendo os dados para avaliação da convergência
@@ -251,9 +274,14 @@ if (k == 1)
     range_y = max(y1) -  min(y1);
 end
 
-hyper(k) = hyper_norm (arc_f);
+hyper(k) = hyper_norm (arc_f, range_y, length_x);
+%hyper(k) = Hypervolume_MEX(arc_f, [mse_worst, sv_worst, 1], 1000); 
+%hyper(k) = hypervolume(arc_f, [0, 0, 0], 1000); 
+%avaliação da convergencia dos minimos e erro, sv, correlação
 erro_c(k) = min(arc_f(:,1));
 sv_c(k) = min(arc_f(:,2));
+%corr_c(k) = min(arc_f(:,3));
+
 
 if(aux_tam(1,1)>=2)
     dist(k) = spacing(arc_f);
@@ -266,15 +294,17 @@ porcentagem = (k+(varargin{4}-1)*ite_mopso)/(varargin{3}*ite_mopso);
 waitbar(porcentagem,varargin{2},sprintf('%i%% along...',100*porcentagem));
 k=k+1;
 end %End do laço das iterações
-
+%mpiprofile viewer
 poda.elapsedTime=toc;
 param_out = arc_x;
-
+%sigma = arc_x(:,2);
+%C = arc_x(:,1);
 pareto = arc_f;
 metricas.classico = [dist' sols' hyper'];
 metricas.classico(1,:) =[];
 metricas.conv = [erro_c' sv_c'];
 metricas.conv(1,:) =[];
 % Construindo o gráfico da diversidade para análise de seu comportamento.
-
+%figure(4)
+%plot (1:k-1, teste_diver);
 end %finaliza a função MOPSO

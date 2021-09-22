@@ -1,4 +1,4 @@
-function m = SLHD (NP, d)
+ function m = SLHD (NP, d)
 % A função gera uma matriz de números aleatórios conforme a definição de
 % Symetric Latin Hypercube. 
 % Esta função é baseada no pseudo código do artigo:

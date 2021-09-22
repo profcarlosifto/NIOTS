@@ -26,23 +26,27 @@ card_est = zeros(ite_mopso,amostra); %Linhas se refere ao número de iterações
 %% Estudo estatístico do MOPSO
 t1 = 1:ite_mopso;
 [~, b]=size(varargin);
-
+%Esse if identifica se a opção cross-validation ativa ou não e define
+%variáveis de acordo com a situação
 if (b == 15)
     conj = cross_set (X1, Y1, k_fold);      %Função que particiona o conjunto de treinamento em k-folder
-    kernel = varargin{14};    
+    kernel = varargin{14};
+    %epsilon = varargin{15};
 else
     conj = [];
-    kernel = varargin{16};    
+    kernel = varargin{16};
+    %epsilon = varargin{17}; 
     varargin{14} = normalize_prediction(varargin{14}, min_x1, max_x1);
 end
 %Definição do arquivo de saída
 nome_arq = varargin{11};
 nome_relat = strcat(nome_arq.path, nome_arq.nome);
+%path = varargin{12}; 
 
-
-
+%nome_relat = nome_arq;
 fileID = fopen(nome_relat,'w+');
 path = nome_arq.path;
+%path = varargin{12}; %Esse path é o mesmo de nome_arq.path mas para mudá-lo é preciso mudar os índeces subsequentes de varargin
 %% Gravando no arquivo de saída os parâmetros do algoritmo empregado
 fprintf(fileID,'General Parameters\n');
 fprintf(fileID,'Optimizer: MOPSO\n');
@@ -68,17 +72,14 @@ elseif (mod == 3)
     fprintf(fileID,'Diversity Factor: AR\n');
 end
 %% Escrevendo o tipo de kernel
-
+% Neste caso poderia ter sido utilizado uma estrutura para receber a string
+% e o número a partir da parte visual. Qual forma seria mais elegante?
 if(kernel == 1)
     fprintf(fileID,'Kernel: RBF\n');
 elseif (kernel == 2)
     fprintf(fileID,'Kernel: Polynomial\n');    
 elseif (kernel == 3)
-    fprintf(fileID,'Kernel: Arcosine\n');
-elseif (kernel == 6)
-    fprintf(fileID,'Kernel: Cauchy\n');
-elseif (kernel == 7)
-    fprintf(fileID,'Kernel: Sigmoid\n');
+    fprintf(fileID,'Kernel: MKL\n');
 end
 
 %% Criando o waitbar
@@ -89,8 +90,14 @@ fid = fopen(nome, 'w');
 fclose(fid);
 %%
 for i=1:amostra
-
-    [metricas, param_out, pareto, poda]= MOPSO_lib_cross(X1, Y1, conj, ite_mopso, mod, tipo_sv, varargin, h, amostra, i); 
+    %param_out -> conjunto de pareto
+    %if (kernel < 3)
+        [metricas, param_out, pareto, poda]= MOPSO_lib_cross(X1, Y1, conj, ite_mopso, mod, tipo_sv, varargin, h, amostra, i); % A variável mod permite a função definir se usa OBL, AR ou nenhum
+    %else
+    %    [metricas, param_out, pareto]= MOPSO_lib_mkl        (X1, Y1, conj, ite_mopso, mod, tipo_sv, varargin, h, amostra, i, epsilon); % A variável mod permite a função definir se usa OBL, AR ou nenhum        
+    %end
+    %convergencia = metricas.conv;
+    %dlmwrite('convergencia.txt', convergencia','-append','delimiter',' '); 
     metricas = metricas.classico;
     metrica_stat_opt_w(nome, metricas);
     fprintf(fileID, '\nPrunning: %i\nTime: %f', poda.tam, poda.elapsedTime);
@@ -101,10 +108,10 @@ for i=1:amostra
         Y1(poda.ind,:) = [];
     end
     
-    if (kernel == 1) || (kernel == 6)||(kernel == 7) % Kernel RBF, Cauchy e Sigmoide
+    if (kernel == 1) % Kernel RBF
         if (tipo_sv == 1) % Classificador
             result_amostra = [1:size(param_out', 2);param_out(:,1:2)'; pareto']; %Excluindo o epsilon do classificador e incluindo os índices
-            fprintf(fileID,'%5s %8s %17s %15s %14s\n','Index' ,'C','Gamma', 'Error', 'SV');
+            fprintf(fileID,'%5s %8s %17s %15s %14s\n','Index' ,'C','Gamma', 'MSE', 'SV');
             fprintf(fileID,'%3i %15.8f %15.8f %15.8f %15.8f\n',result_amostra);
             pareto_models = escreve_saida_classify(param_out, pareto, X1, Y1, path, i, min_x1, max_x1, kernel);
         elseif (tipo_sv == 2) %Regressor SVR
@@ -120,15 +127,14 @@ for i=1:amostra
         elseif (tipo_sv == 5)
             % Colocar aqui o regressor LS-SVM
             escreve_saida_ls(param_out, epsilon, pareto, X1, Y1, path, i, min_x1, max_x1, kernel)
-        elseif (tipo_sv == 6)
-            accuracy(2,1)
+        elseif (tipo_sv == 6)accuracy(2,1)
             % Colocar aqui o SVR multi-target LS-SVM
         end
         
     elseif (kernel == 2)
         if (tipo_sv == 1)
             result_amostra = [1:size(param_out', 2);param_out(:,1:2)'; pareto'];
-            fprintf(fileID,'%5s %8s %15s %15s %15s\n', 'Index','C','Degree', 'Error', 'SV');
+            fprintf(fileID,'%5s %8s %15s %15s %15s\n', 'Index','C','Degree', 'MSE', 'SV');
             fprintf(fileID,'%3i %15.8f %15.8f  %15.8f %15.8f\n',result_amostra);
             escreve_saida_classify(param_out, pareto, X1, Y1, path, i, min_x1, max_x1, kernel)
             
@@ -150,34 +156,28 @@ for i=1:amostra
         end   
         
     elseif (kernel == 3)  % Kernel Arc_seno
-        if (tipo_sv == 1)
-            result_amostra = [1:size(param_out', 2);param_out(:,1:1)'; pareto'];
-            fprintf(fileID,'%5s %15s %20s %10s\n', 'Index', 'C', 'Error', 'SV');
-            fprintf(fileID,'%3i %20.8f  %15.4f %15.4f\n',result_amostra);            
-
-        elseif tipo_sv == 2
-            result_amostra = [1:size(param_out', 2);param_out(:,1:2)'; pareto'];
-            fprintf(fileID,'%8s %10s %20s %15s %15s\n', 'Index', 'C','Epsilon', 'MSE', 'SV');
-            fprintf(fileID,'%3i %20.8f  %15.4f %15.4f %15.4f\n',result_amostra);
-        else
-            disp('SVM report not implemented!' )
-        end
-        
-    elseif (kernel == 4)  % Deep kernel
-        if (tipo_sv == 1)
-            result_amostra = [1:size(param_out', 2);param_out(:,1:3)'; pareto'];
-            fprintf(fileID,'%5s %15s %20s %15s %15s %10s\n', 'Index', 'C','Gamma', 'Degree', 'Error', 'SV');
-            fprintf(fileID,'%3i %20.8f %20.8f %8i %17.4f %15.4f\n',result_amostra);
-            
-        elseif tipo_sv == 2 %terminar de ajeitar o relatório.
-            result_amostra = [1:size(param_out', 2);param_out(:,1:2)';param_out(:,3)';param_out(:,4)'; pareto'];
-            fprintf(fileID,'%6s %10s %20s %13s %15s %10s %10s\n', 'Index', 'C','Gamma', 'Degree', 'Epsilon', 'MSE', 'SV');
-            fprintf(fileID,'%3i %20.8f  %15.4f %8i %15.4f %15.4f %8i\n',result_amostra);
-        else
-            disp('SVM report not implemented!' )
-        end
+        result_amostra = [1:size(param_out', 2);param_out(:,1:2)'; pareto'];
+        fprintf(fileID,'%8s %10s %20s %15s %15s\n', 'Index', 'C','Epsilon', 'MSE', 'SV');
+        fprintf(fileID,'%3i %20.8f  %15.4f %15.4f %15.4f\n',result_amostra);
+%         if tipo_sv <= 3
+%             escreve_saida(param_out, epsilon, pareto, X1, Y1, path, i, min_x1, max_x1, kernel)               %Escreve o modelo da máquina SVR
+%         else
+%             escreve_saida_ls(param_out, epsilon, pareto, X1, Y1, path, i, min_x1, max_x1, kernel)
+%         end
     end
 end
+% answer = questdlg('Would you like NIOTS create an ensemble with Pareto Set?','Ensemble', 'Yes','No', 'Yes');
+% % Handle response
+% switch answer
+%     case 'Yes'
+%         ensemble = ensemble_combination (pareto_models, varargin{14}, varargin{15}, min_x1, max_x1, pareto); %O máximo e o mínimo aqui diz respetio ao conjunto de treinamento
+%         
+%         escreve_ens(ensemble, [nome_arq.path 'Ensemble_' nome_arq.nome] );
+%         
+%     case 'No'
+% 
+%  
+% end
 
 fprintf(fileID,'\n');
 fclose(fileID);

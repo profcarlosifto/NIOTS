@@ -1,4 +1,3 @@
-function J=CostFunction(X,Dat)
 %% CostFunction.m 
 % J  [OUT] : The objective Vector. J is a matrix with as many rows as
 %            trial vectors in X and as many columns as objectives.
@@ -6,7 +5,28 @@ function J=CostFunction(X,Dat)
 %            trial vector and as many columns as decision variables.
 % Dat [IN] : Parameters defined in NNCparam.m
 % 
+%%
+%% Beta version 
+% Copyright 2006 - 2012 - CPOH  
+% Predictive Control and Heuristic Optimization Research Group
+%      http://cpoh.upv.es
+% ai2 Institute
+%      http://www.ai2.upv.es
+% Universitat Polit�cnica de Val�ncia - Spain.
+%      http://www.upv.es
+%%
+%% Author
+% Gilberto Reynoso Meza
+% gilreyme@upv.es
+% http://cpoh.upv.es/en/gilberto-reynoso-meza.html
+% http://www.mathworks.es/matlabcentral/fileexchange/authors/289050
+%%
+%% For new releases and bug fixing of this Tool Set please visit:
+% http://cpoh.upv.es/en/research/software.html
+% Matlab Central File Exchange
 
+%% Main call
+function J=CostFunction(X,Dat)
 Xpop = size(X,1);
 %epsilon = Dat.epsilon; % arrumar isso depois, parei aqui 25/11/2016
 %J = zeros(Xpop, Dat.NOBJ);
@@ -21,7 +41,6 @@ for i = 1:Xpop           %Coloca o parfor aqui para paralelizar o MODE.
             yc=size(Dat.Y1, 2);
             Xd = [Dat.X1, Dat.Y1];
             l = size(Xd, 2);
-            Dat.conj = cross_set (Xd, yc, m);
             for i1=1:m
                 conj_aux = Dat.conj;
                 X2 = Xd(Dat.conj(i1,:),1:(l-yc));

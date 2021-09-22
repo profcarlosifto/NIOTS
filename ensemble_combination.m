@@ -14,16 +14,11 @@ function ensemble = ensemble_combination (pareto, x, y, x_min, x_max, pareto_fro
 % x_min -> mínimo do conjunto de treinamento.
 % x_max -> máximo do conjunto de treinamento.
 
-%Gerando todos os MSE dos modelos
+%[x, y] = ler_dados('/home/carlos/Documentos/doutorado/sistema/funcao/SwingUp_28/SwingUp_28/SwingUp_28_teste.txt');
 x = normalize_prediction(x, x_min, x_max);
 m1 = length(pareto);
- for i = 1:m1
-     [saida(:,i), accuracy(:,i), ~] = svmpredict(y,x, pareto(i).model);
- end
-
-%Gerando as combinações de ensembles
 n_ens = 3; % Número de máquinas no ensemble;
-%saida = zeros(size(y,1),n_ens);
+saida = zeros(size(y,1),n_ens);
 w = zeros(n_ens,1);
 k = 1;
 m = 2^m1-1;
@@ -36,12 +31,13 @@ for i = 1:m
        for j = 1:aux2 %n_ens 
           [saida(:,j), accuracy, ~] = svmpredict(y,x, pareto(ind_ens(j)).model);
           ensemble(k).sv = ensemble(k).sv + pareto(ind_ens(j)).model.totalSV;
-          ensemble(k).svm_erro(j) = accuracy(2);
+          ensemble(k).svm_erro(j) = pareto_front(ind_ens(j)).mse; %usando o erro da fronteira de pareto
+          %ensemble(k).svm_erro(j) = accuracy(2);
           saida_num(:, j) = saida(:,j)/ensemble(k).svm_erro(j);          
        end
        
-       ensemble(k).ens_saida = sum(saida_num,2)./(sum(1./ensemble(k).svm_erro));
-       ensemble(k).mse = mean((y - ensemble(k).ens_saida).^2);
+       enemble(k).ens_saida = sum(saida_num,2)./(sum(1./ensemble(k).svm_erro));
+       ensemble(k).mse = mean((y - enemble(k).ens_saida).^2);
        ensemble(k).ind_ens = ind_ens;
        ensemble(k).diff = 0;
        k = k + 1;
@@ -57,6 +53,7 @@ l=length(ensemble);
 i = 1;
 for k = 1:l
     min_mse_svm = min(ensemble(k).svm_erro);
+    %min_mse_svm = min([pareto_front(ensemble(k).ind_ens).mse]); % A diferenção é a definição da coluna dentro de pareto_front em relação ao implementado dentro do MOPSO e MODE.
     if ensemble(k).mse < min_mse_svm
         best_ens(i) = ensemble(k);
         best_ens(i).diff = 1-ensemble(k).mse/min_mse_svm;

@@ -9,7 +9,7 @@ function [particles, y, v, N] = initialize_particles(S, x_max, x_min, ini_v, max
 % kernel    ->  Define o tipo do kernel.
 
 if tipo_sv == 1 % Classificador
-    if (kernel == 1)||(kernel == 6) || (kernel == 7)% RBF
+    if kernel == 1 % RBF
         N = 2;
         m = SLHD (S, N);    %Função que gera a população inicial melhor distribuído. Utilizando a técnica Symmetric Latin Hypercube Distribution.
         x = zeros(S,N);
@@ -73,7 +73,7 @@ if tipo_sv == 1 % Classificador
         end
     end
 elseif tipo_sv == 2 % Regressor
-    if (kernel == 1)  || (kernel == 6) || (kernel == 7)% RBF
+    if kernel == 1 % RBF
         N = 3;
         m = SLHD (S, N);    %Função que gera a população inicial melhor distribuído. Utilizando a técnica Symmetric Latin Hypercube Distribution.
         x = zeros(S,N);
@@ -88,7 +88,7 @@ elseif tipo_sv == 2 % Regressor
                 for i = 1:S
                     x(i,j) = max_ep*m(i, j); %vetor que armazena as partículas (i número de partículas) x(i,1)-> Sigma, x(i,2) -> C
                     y(i,j) = 1e10;
-                    v(i,j) = rand*(max_ep/2); % Velocidade inicial dos epsilons
+                    v(i,j) = rand; %Rand altera a
                 end
             end
         end
@@ -113,7 +113,7 @@ elseif tipo_sv == 2 % Regressor
                for i = 1:S
                     x(i,j) = max_ep*m(i, j); %vetor que armazena as partículas (i número de partículas) x(i,1)-> Sigma, x(i,2) -> C
                     y(i,j) = 1e10;
-                    v(i,j) = rand*(max_ep/2); % Velocidade inicial dos epsilons
+                    v(i,j) = rand; %Rand altera a
                 end
             end
         end
@@ -132,7 +132,7 @@ elseif tipo_sv == 2 % Regressor
                 for i = 1:S
                     x(i,j) = max_ep*m(i, j); %vetor que armazena as partículas (i número de partículas) x(i,1)-> Sigma, x(i,2) -> C
                     y(i,j) = 1e10;
-                    v(i,j) = rand*(max_ep/2); % Velocidade inicial dos epsilons
+                    v(i,j) = rand; %Rand altera a
                 end
             end
         end
@@ -158,7 +158,7 @@ elseif tipo_sv == 2 % Regressor
                 for i = 1:S
                     x(i,j) = max_ep*m(i, j); %vetor que armazena as partículas (i número de partículas) x(i,1)-> Sigma, x(i,2) -> C
                     y(i,j) = 1e10;
-                    v(i,j) = rand*(max_ep/2); % Velocidade inicial dos epsilons
+                    v(i,j) = rand; %Rand altera a
                 end
             end
         end

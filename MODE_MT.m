@@ -59,7 +59,8 @@ for k=1:amostra
             model(i) = trainlssvm({X1,Y1(:,i),'f',C, sigma,'RBF_kernel','preprocess'}); %por enquanto funciona apenas para aproximadores de funçẽos SRV e kernel RBF
             
         end
-        param(i,:) = [C sigma]; 
+        param(i,:) = [C sigma]; %armazena os parâmetros utilizados nas máquinas que representa cada uma das saídas.
+        %Gravando as metricas da fronteira de pareto no arquivo estatística
         escreve_metrica_stat_mt(nome_arq, r.metricas, amostra, cy, j);
       
         %Escolhendo o tipo de kernel
@@ -96,7 +97,7 @@ for k=1:amostra
             model2(i) = svmtrain(s(i).meta_y, s(i).meta_x, options);
             
         else
-            model2(i) = trainlssvm({s(i).meta_x, s(i).meta_y,'f',C, sigma,'RBF_kernel','preprocess'}); 
+            model2(i) = trainlssvm({s(i).meta_x, s(i).meta_y,'f',C, sigma,'RBF_kernel','preprocess'}); %por enquanto funciona apenas para aproximadores de funçẽos SRV e kernel RBF            
         end
 
         param2(i,:) = [C sigma];
@@ -115,7 +116,8 @@ for k=1:amostra
             fprintf(fileID,'%7.4f %10.8f  %7.4f %7.4f %7.4f %7.4f %7.4f\n',sol');
         end
     end
-       
+    %Fazer essa função repetir um modelo para cada amostra (pelo menos)
+    
     if tipo_sv <= 3
         escreve_saida_mt(model, model2, param, param2, X1, Y1, s, varargin{6}.path, k, min_x1, max_x1, min_x2, max_x2, MODEDat.kernel, epsilon);
     else

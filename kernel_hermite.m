@@ -12,7 +12,7 @@ d = size(x,2);
 kernel = 1;
 for j = 1:d % For do produtório
     k = 0;
-    for i = 0:n 
+    for i = 0:n % For do somatório, controla a ordem do polinômiio hermitiano.
         k = k + hermite_probabilistc(i, x(j))*hermite_probabilistc(i, y(j));
     end    
     kernel = kernel+k;

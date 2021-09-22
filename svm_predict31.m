@@ -24,5 +24,5 @@ for i = 1:model.card_sv
 end
 z(k) = fx2 - model.rho;   %LIBSVM: A Library for Support Vector Machines p. 06. rho = -b, tem-se -model.rho.
 end
-
+%mse = (1/c_xi)*sum((yi - z).^2);
 end

@@ -1,0 +1,17 @@
+Parâmetros Gerais
+Iterações: 	500
+Cross-set: 	2
+Amostra: 	1
+Limite inferior: 1.000000e-05
+Limite superior 250
+
+Parâmetros do MOPSO
+
+ População:		20
+ Inércia Inicial (w_0): 18.0000
+ Inércia final (w_f): 	 0.0001
+ Coef. Cognitivo (c_1):  1.9000
+ Coef. Social (c_2): 	 2.2000
+ Velocida Max (v_max): 	25.0000
+Diversity Factor: None
+Kernel: RBF

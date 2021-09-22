@@ -37,7 +37,8 @@ for i = 1:cl
         fprintf(fileID, 'Kernel: RBF_kernel\n');
         options = ['-s 0',' -c ', C1,' -t 2 ','-g ', gama1];
         pareto_models(i).model = svmtrain(y, x, options);
-
+%         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nErro:    %10.6f\nSV_CV:    %10.6f\nCorrelation: %10.6f\n', ... 
+%         C(i,1), gama(i,1), pareto(i,1), pareto(i,2), pareto(i,3));
         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nErro:    %10.6f\nSV_CV:    %10.6f\n', ... 
         C(i,1), gama(i,1), pareto(i,1), pareto(i,2)); % dois objetivos
 
@@ -46,7 +47,8 @@ for i = 1:cl
         fprintf(fileID, 'Kernel: poly_kernel\n');
         options = ['-s 0',' -c ', C1,' -t 1 ','-g 1 -r 1', ' -d ', gama1];
         pareto_models(i).model = svmtrain(y, x, options);
-
+%         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nError:    %10.6f\nSV_CV:    %10.6f\nCorrelation: %10.6f\n', ... 
+%         C(i,1), gama(i,1), pareto(i,1), pareto(i,2), pareto(i,3));
          fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nError:    %10.6f\nSV_CV:    %10.6f\n', ... 
          C(i,1), gama(i,1), pareto(i,1), pareto(i,2)); % dois objetivos
 
@@ -59,17 +61,7 @@ for i = 1:cl
        pareto_models(i).model = svmtrain([y x], matriz, options);
        fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nMi:     %10.6f\nEpsilon: %10.6f\nErro:    %10.6f\nSV_CV:    %10.6f\n', ... 
        C(i,1), gama(i,1), param_out(i,3), pareto(i,1), pareto(i,2));
-       
-       
-    elseif (kernel == 6)
-        fprintf(fileID, 'Kernel: Cauchy\n');
-        
-        matriz = gram_matrix_cauchy(x,x, param_out(i,2));
-        options = ['-s 3',' -c ', C1,' -t 4 '];
-        pareto_models(i).model = svmtrain([y x], matriz, options);
-        fprintf(fileID,'C:        %10.6f\nGamma:    %10.6f\nError:    %10.6f\nSV_CV:    %10.6f\n', ...
-            param_out(i,1), param_out(i,2), pareto(i,1), pareto(i,2));
-        
+       %C(i,1), gama(i,1), param_out(i,3), epsilon, pareto(i,1), pareto(i,2), pareto(i,3));
        
     end
     if (pareto_models(i).model.nr_class == 2)
@@ -92,12 +84,27 @@ for i = 1:cl
         %fprintf(fileID, '');
 
     end
+    %Salvando dados para teste do código
+%     alfa_p = model.sv_coef;
+%     x_p = x(model.sv_indices,:);
+%     dim_t = size(x,1);
+%     grau_p = gama(:,1);
+%     save('pred_param.mat', 'alfa_p', 'x_p', 'dim_t', 'grau_p');
+    
     %% Normalização
     fprintf(fileID, 'Dados Normalização\nMin        Max\n');
     [~, c_x1]=size(x);
     for j=1:c_x1
         fprintf(fileID, '%10.6f             %10.6f\n', min_x(1,j), max_x(1,j));
     end
+    %%
+     %Parte do código que grava apenas os dados do conjunto de treinamento
+     %referente aos SVs
+     
+%     fprintf(fileID, '\nConjunto de treinamento\n');
+%     sv_point = full(model.SVs);
+%     fprintf(fileID,[repmat('%10.6f', 1, size(sv_point, 2)) '\n'], sv_point');
+    
      fprintf(fileID, '\nConjunto de treinamento\n');
      x_t = [x y];
      fprintf(fileID,[repmat('%10.6f', 1, size(x_t, 2)) '\n'], x_t');

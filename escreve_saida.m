@@ -27,45 +27,52 @@ for i = 1:cl
     fprintf(fileID,'sv\n');
     fprintf(fileID, 'Modelo: LibSVM\n');
     if (kernel == 1)
-        C1 = num2str(exp(param_out(i,1)));
-        gama1 = num2str(exp(param_out(i,2))); 
+        C1 = num2str(exp(param_out(i,1)));      %Para trabalhar com a base exponencial dos valores de C e gama a função foi alterada aqui
+        gama1 = num2str(exp(param_out(i,2)));    % Nos classificadores foi alterada diretamente nas função de predição.
         epsilon1 = num2str(param_out(i,3));
         fprintf(fileID, 'Kernel: RBF_kernel\n');
         options = ['-s 3',' -c ', C1,' -t 2 ','-g ', gama1, ' -p ', epsilon1];
-        pareto_models(i).model = svmtrain(y, x, options);               
+        pareto_models(i).model = svmtrain(y, x, options);
+        %         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n1-R^2: %10.6f\n', ...
+        %         exp(param_out(i,1)), exp(param_out(i,2)), param_out(i,3), pareto(i,1), pareto(i,2), pareto(i,3)); % Alteração aqui para o C e gama exp(C)
+        
         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n', ...
-           param_out(i,1), param_out(i,2), param_out(i,3), pareto(i,1), pareto(i,2));  %Usando dois objetivos
+            exp(param_out(i,1)), exp(param_out(i,2)), param_out(i,3), pareto(i,1), pareto(i,2));  %Usando dois objetivos
         
         
     elseif (kernel == 2) % Fazer o kernel polinomial funcionar direito.
-        C1 = num2str(exp(param_out(i,1)));      
-        grau = num2str(param_out(i,2));   
+        C1 = num2str(exp(param_out(i,1)));      %Para trabalhar com a base exponencial dos valores de C e gama a função foi alterada aqui
+        grau = num2str(param_out(i,2));    % Nos classificadores foi alterada diretamente nas função de predição.
         epsilon1 = num2str(param_out(i,3));
         fprintf(fileID, 'Kernel: poly_kernel\n');
-        options = ['-s 3',' -c ', C1,' -t 1 ','-g 1 -r 0', ' -d ', grau, ' -p ', epsilon1];
+        options = ['-s 3',' -c ', C1,' -t 1 ','-g 1 -r 1', ' -d ', grau, ' -p ', epsilon1];
         pareto_models(i).model = svmtrain(y, x, options);
-                
+        %         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n1-R^2: %10.6f\n', ...
+        %         param_out(i,1), param_out(i,2), param_out(i,3), pareto(i,1), pareto(i,2), pareto(i,3));
+        
         fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n', ...
             param_out(i,1), param_out(i,2), param_out(i,3), pareto(i,1), pareto(i,2)); %Usando dois objetivos
         
         
     elseif (kernel == 3)
-        C1 = num2str(exp(param_out(i,1))); 
+        C1 = num2str(exp(param_out(i,1)));      %Para trabalhar com a base exponencial dos valores de C e gama a função foi alterada aqui
         epsilon1 = num2str(param_out(i,2));
         
         fprintf(fileID, 'Kernel: Arccosine\n');
-        matriz = gram_matrix_cos(y, x);
+        matriz = gram_matrix_cos(x);
         options = ['-s 3',' -c ', C1,' -t 4 ', ' -p ', epsilon1];
         
         pareto_models(i).model = svmtrain([y x], matriz, options);
-                
+        %        fprintf(fileID,'C:   %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV:    %10.6f\n1-R^2:    %10.6f\n', ...
+        %        param_out(i,1), param_out(i,2), pareto(i,1), pareto(i,2), pareto(i,3));
+        
         fprintf(fileID,'C:   %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV:    %10.6f\n', ...
             param_out(i,1), param_out(i,2), pareto(i,1), pareto(i,2));
         
         
     elseif (kernel == 4)
         C1 = num2str(exp(param_out(i,1)));
-        gama1 = param_out(i,2);
+        gama1 = exp(param_out(i,2));
         grau = param_out(i,3);
         epsilon1 = num2str(param_out(i,4));
         
@@ -78,43 +85,19 @@ for i = 1:cl
             param_out(i,1), param_out(i,2), param_out(i,3), param_out(i,4), pareto(i,1), pareto(i,2), pareto(i,3));
         
     elseif (kernel == 5)
-        C1 = num2str(exp(param_out(i,1)));      
+        C1 = num2str(exp(param_out(i,1)));      %Para trabalhar com a base exponencial dos valores de C e gama a função foi alterada aqui
         epsilon1 = num2str(param_out(i,3));
         grau = num2str(param_out(i,2));
         fprintf(fileID, 'Kernel: Hermite\n');
         
-        matriz = gram_matrix_hermite(x,x, param_out(i,2));
+        matriz = gram_matrix_hermite(x, grau);
         
         options = ['-s 3',' -c ', C1,' -t 4 ', ' -p ', epsilon1];
         
         pareto_models(i).model = svmtrain([y x], matriz, options);
         
-        fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n', ...
-            param_out(i,1), param_out(i,2), param_out(i,3), pareto(i,1), pareto(i,2)); %Usando dois objetivos
-    elseif (kernel == 6)
-        C1 = num2str(exp(param_out(i,1)));      
-        matriz = gram_matrix_cauchy(x, x, param_out(i,2));
-        epsilon1 = num2str(param_out(i,3));
-        
-        fprintf(fileID, 'Kernel: Cauchy\n');
-        options = ['-s 3',' -c ', C1,' -t 4 ', ' -p ', epsilon1];
-        pareto_models(i).model = svmtrain([y x], matriz, options);
-      
-        fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n', ...
-        param_out(i,1), param_out(i,2), param_out(i,3), pareto(i,1), pareto(i,2));  %Usando dois objetivos
-    
-    elseif (kernel == 7)
-        C1 = num2str(exp(param_out(i,1)));      
-        gama1 = num2str(param_out(i,2));    
-        coef = num2str(param_out(i,3));
-        epsilon1 = num2str(param_out(i,4));
-        fprintf(fileID, 'Kernel: Sigmoid\n');
-        options = ['-s 3',' -c ', C1,' -t 3 ','-g ', gama1, ' -p ', epsilon1, ' -r ', coef];
-        pareto_models(i).model = svmtrain(y, x, options);
-        
-        fprintf(fileID,'C:        %10.6f\nGama:    %10.6f\nCoef:    %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV_CV:    %10.6f\n', ...
-            param_out(i,1), param_out(i,2), param_out(i,3), param_out(i,4), pareto(i,1), pareto(i,2));  %Usando dois objetivos
-        
+        fprintf(fileID,'C:   %10.6f\nEpsilon: %10.6f\nMSE:    %10.6f\nSV:    %10.6f\n', ...
+        param_out(i,1), param_out(i,2), pareto(i,1), pareto(i,2));
         
     end
 
@@ -125,7 +108,7 @@ for i = 1:cl
     x_p = x(pareto_models(i).model.sv_indices,:);
     dim_t = size(x,1);
     grau_p = param_out(:,2);
-    
+    %save('pred_param.mat', 'alfa_p', 'x_p', 'dim_t', 'grau_p');
     fprintf(fileID, '%i       %10.6f\n', aux_model);
     %% Normalização
     fprintf(fileID, 'Dados Normalização\nMin        Max\n');

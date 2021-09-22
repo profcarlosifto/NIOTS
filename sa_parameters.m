@@ -5,20 +5,27 @@ function [F, Cr] = sa_parameters (JxParent, F, Cr, n, Generaciones, criterio)
 % sgima -> desvio padrão calculado dentro laço da geração.
 % criterio -> função objetivo que está sendo avaliada nesta iteração
 
+%sigma = 0.8-0.45*(1-(n/Generaciones)^2);
+% sigma_Cr = 0.8-0.45*(1-(n/Generaciones)^2)
 sigma = 0.1+0.4*(1-(n/Generaciones)^2);
 sigma_Cr = sigma;
+%sigma_Cr = 0.1+0.1*(1-(n/Generaciones)^2);
 w = peso_w (JxParent, criterio);
 Fw = sum(F.*w);
 Crw = sum(Cr.*w);
 PS = size(JxParent,1);
 for i = 1:PS
-    F(i,1) = normrnd(Fw,sigma);
+    %F(i,1) = cauchy_dist(Fw,sigma);
+    F(i,1) = stblrnd(.5,1,sigma,Fw); %distribuição de Levy
+    %F(i,1) = normrnd(Fw,sigma);
     Cr(i,1) = normrnd(Crw,sigma_Cr);
 end
 F = min(1, F); %truncation [0 1]
 pos = find(F <= 0);
 while ~ isempty(pos)
-    F(pos(1)) = normrnd(Fw,sigma);    
+    %F(pos(1)) = normrnd(Fw,sigma); % pos(1) -> evita que todas as posições inicialmente negativas sejam iguais    
+    %F(pos(1)) = cauchy_dist(Fw,sigma); % pos(1) -> evita que todas as posições inicialmente negativas sejam iguais
+    F(pos(1)) = stblrnd(.5,1,sigma,Fw); %distribuição de Levy
     F = min(1, F);                      % truncation
     
     pos = find(F <= 0);

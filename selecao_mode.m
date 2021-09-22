@@ -2,6 +2,8 @@ function [Parent, JxParent] = selecao_mode(PSet, PFront, Xpop)
 % Função que seleciona a população da próxima iteração quando a candidata a
 % fronteira de pareto é maior que a população.
 % População é composta por um terço melhores de cada função objetivo.
+% A função não possui com quantidades ímpares (duas funções - SVM) ou quantidades
+% qua não são multiplas de 3 (três funções - SVR)
 Parent = [];
 JxParent = [];
 tam = Xpop/2;

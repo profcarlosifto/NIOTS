@@ -32,9 +32,6 @@ if tipo_sv == 7
     elseif kernel == 2
         options = ['-s 3 -t 1 -p ', eps, ' -h 0 ', '-g 1 -r 1 -d '];        
         gama_aux = gama;
-    elseif kernel == 6
-        options = ['-s 3 -t 4 -p ', eps, ' -h 0 ', ' -g '];
-        gama_aux = exp(gama);        
     else
         disp('Kernel não implmentado!')
     end
@@ -45,11 +42,8 @@ elseif tipo_sv == 8
         options = ['-s 0 -t 2 -h 0 ', '-g '];
         gama_aux = exp(gama);
     elseif kernel == 2
-        options = ['-s 0 -t 1 -h 0 ', '-g 1 -r 1 -d '];
+        options = ['-s 0 -t 1 -h 0 ', '-g 1 -r 1 -d '];        
         gama_aux = gama;
-    elseif kernel == 6
-        options = '-s 0 -t 4 -h 1 ';
-        gama_aux = exp(gama);
     else
         disp('Kernel não implmentado!')
     end
@@ -64,34 +58,12 @@ for i = 1:m
     for j = 1:n
         C1 = num2str(C_aux(i));
         kpar1 = num2str(gama_aux(j));
-        
-        
-        if kernel <= 2
-            options_aux = [options, kpar1, ' -c ', C1];
-            model = svmtrain(y, x, options_aux);
-            
-            if tipo_sv == 7
-                [~, accuracy, ~] = svmpredict(y_v,x_v, model);
-            else
-                [~, accuracy, ~] = svmpredict(y_v,x_v, model);
-                %[accuracy(2), ~] = metric_classification_d2 (y_v, yf, accuracy);
-            end
-            
-        elseif kernel == 6
-            options_aux = [options, ' -c ', C1];
-            matriz = gram_matrix_cauchy(x,x, gama_aux(j));
-            model = svmtrain([y, x], matriz, options_aux);
-            
-            if tipo_sv == 7
-                matriz = gram_matrix_cauchy(x_v, x, gama_aux(j));
-                [yf, accuracy, ~] = svmpredict(y_v, matriz, model);
-                
-            else
-                matriz = gram_matrix_cauchy(x_v, x, gama_aux(j));
-                [yf, accuracy, ~] = svmpredict(y_v, matriz, model);
-                [accuracy(2), ~] = metric_classification_d2 (y_v, yf, accuracy);
-            end
-            
+        options_aux = [options, kpar1, ' -c ', C1];
+        model = svmtrain(y, x, options_aux);
+        if tipo_sv == 7
+            [~, accuracy, ~] = svmpredict(y_v,x_v, model);            
+        else
+            [~, accuracy, ~] = svmpredict(y_v,x_v, model);            
         end
         sol(k,:) = [C(i) gama(j) accuracy(2) model.totalSV];
         k = k+1;

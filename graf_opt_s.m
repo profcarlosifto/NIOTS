@@ -82,3 +82,16 @@ saveas(h(4), strcat(nome,'Mediana Cardinalidade do conjunto Non-dominate'),'jpg'
 saveas(h(5), strcat(nome,'Desvio Metrica Spacing'),'jpg')
 saveas(h(6), strcat(nome,'Desvio Cardinalidade do conjunto Non-dominate'),'jpg')
 end
+
+ %{
+    %Plota o gráfico da fronteira de pareto
+    hold on
+    h(3)=figure(3);
+    plot3(pareto(:,1), pareto(:,2), pareto(:,3),'r*')
+    title('Relação SV e Erro')
+    xlabel('Erro', 'FontSize',12)
+    ylabel('Vetores de Suporte','FontSize',12)
+    zlabel('Correlação','FontSize',12)
+    grid on;
+    saveas(h(3),strcat(varargin{12},'Conjunto Non-dominate ',int2str(i)),'jpg')
+    %}

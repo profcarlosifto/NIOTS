@@ -13,6 +13,8 @@ diversity_s = diversity_evaluate(Parent, limites);
 end
 
 function s = diversity_evaluate(x, limites)
+%Função que calcula a diversidade de uma população de acordo com as
+%equações do slide da aula de sistemas bioinspirados.
 % x ->  é a matriz da população.
 % s -> variável que retorna a diversidade da população.
 [S, N] = size(x);

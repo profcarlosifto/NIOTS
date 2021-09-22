@@ -16,6 +16,8 @@ all_sols = 1:absQ;
 for i=1:absQ
     sol = pf(i,:);
     ind_outros = setdiff(all_sols,i);
+    % outros = pf(all((pf ~= repmat(sol,absQ,1))')',:); % dá problema
+    % quando os fitness são iguais
     outros = pf(ind_outros,:);
     somatorio = [];
     for j=1:M

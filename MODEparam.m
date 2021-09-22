@@ -38,19 +38,19 @@ MODEDat.rand_type = varargin{7};
 % Limites do AR
 
 %% Variables regarding the optimization problem
-[k1, k2]=size(X1);                         
+[k1, k2]=size(X1);                         % Acho que esta linha é inutil em versões posteriores retirar.
 MODEDat.NOBJ = 2;                          % Number of objectives
 MODEDat.NRES = 0;                          % Number of constraints
 lim_inf = varargin{4};
 lim_sup = varargin{5};
-if (MODEDat.kernel == 1)||(MODEDat.kernel == 6)  % Kernel RBF ou Cauchy ou Sigmoide
+if (MODEDat.kernel == 1)                        % Kernel RBF
     MODEDat.NVAR   = 3;                        % Number of decision variables
     MODEDat.FieldD =[lim_inf*ones(MODEDat.NVAR-1,1)...
-                    lim_sup*ones(MODEDat.NVAR-1,1); 0.1 MODEDat.epsilon]; 
-               
+                    lim_sup*ones(MODEDat.NVAR-1,1); 0.1 MODEDat.epsilon]; % %Epsilon limites 30/11/2018 controlar a quantidade de SV Cascade Tanks
+    %MODEDat.FieldD(3, :) = [0.0001 4];            
 elseif (MODEDat.kernel == 2)                   % Kernel polinomial
     MODEDat.NVAR   = 3;                        % Number of decision variables
-    MODEDat.FieldD =[lim_inf*ones(1,1) lim_sup*ones(1,1); ones(1,1) 10*ones(1,1); 0.0001 MODEDat.epsilon]; 
+    MODEDat.FieldD =[lim_inf*ones(1,1) lim_sup*ones(1,1); ones(1,1) 20*ones(1,1); 0.0001 MODEDat.epsilon]; % Initialization bounds % Initialization bounds of polynomial degree
     
 elseif (MODEDat.kernel == 3)                    % Kernel cos
     MODEDat.NVAR   = 2;     
@@ -64,9 +64,6 @@ elseif (MODEDat.kernel == 5)                   % Kernel hermitiano
     MODEDat.NVAR   = 3;                        % Number of decision variables
     MODEDat.FieldD =[lim_inf*ones(1,1) lim_sup*ones(1,1); ones(1,1) 7*ones(1,1); 0.0001 MODEDat.epsilon]; % Initialization bounds % Initialization bounds of polynomial degree
     
-elseif (MODEDat.kernel == 7)
-    MODEDat.NVAR   = 4;     
-    MODEDat.FieldD =[lim_inf*ones(3,1) lim_sup*ones(3,1); 0.0001 MODEDat.epsilon]; % Initialization bounds
 
 end
 MODEDat.mop = str2func('CostFunction');    % Cost function
