@@ -252,7 +252,7 @@ for n=1:Generaciones
     %metrica(n) = nadir_ideal (PFront, max(MODEDat.Y1), length_x);
     %hyper(n) = Hypervolume_MEX(PFront, [0, 0, 0]);
     %PFront_norm = [];
-    hyper(n) = Hypervolume_MEX(PFront./[mse_worst, l_x1], [mse_worst, l_x1]);
+    hyper(n) = 1; %desativado
     
     
     if(aux1(1,1)>=2)
